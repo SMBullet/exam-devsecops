@@ -23,18 +23,26 @@ public class EmployeeService {
     }
 
     public Employee addEmployee(Employee employee, Locale locale) {
+        // Default to English if locale is null
+        Locale effectiveLocale = (locale != null) ? locale : Locale.ENGLISH;
+
         Optional<Employee> existingEmployee = employeeRepository.findByEmail(employee.getEmail());
         if (existingEmployee.isPresent()) {
-            String errorMessage = messageSource.getMessage("error.email.already.in.use", null, locale);
+            String errorMessage = messageSource.getMessage("email.already.in.use", null, effectiveLocale);
             throw new IllegalArgumentException(errorMessage);
         }
+
         employeeRepository.save(employee);
+        String successMessage = messageSource.getMessage("employee.added", null, effectiveLocale);
+        System.out.println(successMessage);
         return employee;
     }
 
     public Employee getEmployee(Long id, Locale locale) {
+        Locale effectiveLocale = (locale != null) ? locale : Locale.ENGLISH;
+
         return employeeRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(messageSource.getMessage("error.employee.not.found", null, locale)));
+                .orElseThrow(() -> new IllegalArgumentException(messageSource.getMessage("employee.not.found", null, effectiveLocale)));
     }
 
     public List<Employee> getAllEmployees() {
@@ -42,15 +50,24 @@ public class EmployeeService {
     }
 
     public Employee updateEmployee(Long id, Employee employeeDetails, Locale locale) {
-        Employee existingEmployee = getEmployee(id, locale);
+        Locale effectiveLocale = (locale != null) ? locale : Locale.ENGLISH;
+
+        Employee existingEmployee = getEmployee(id, effectiveLocale);
         existingEmployee.setFirstName(employeeDetails.getFirstName());
         existingEmployee.setLastName(employeeDetails.getLastName());
         existingEmployee.setEmail(employeeDetails.getEmail());
+
+        String successMessage = messageSource.getMessage("employee.added", null, effectiveLocale); // This should be for updating
+        System.out.println(successMessage);
+
         return employeeRepository.save(existingEmployee);
     }
 
     public void deleteEmployee(Long id, Locale locale) {
-        Employee employee = getEmployee(id, locale);
+        Locale effectiveLocale = (locale != null) ? locale : Locale.ENGLISH;
+
+        Employee employee = getEmployee(id, effectiveLocale);
         employeeRepository.delete(employee);
+
     }
 }
